@@ -11,7 +11,12 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/effects-factory' },
-      { text: 'GitHub', link: 'https://github.com/fike110/jeffect' }
+      { 
+        text: 'Javadoc', 
+        link: 'https://javadoc.io/doc/io.github.fike110/jeffect',
+        target: '_blank'
+      },
+      { text: 'GitHub', link: 'https://github.com/fike110/jeffect', target: '_blank' }
     ],
     sidebar: {
       '/guide/': [

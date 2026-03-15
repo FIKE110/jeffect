@@ -1,5 +1,8 @@
 # Effects Factory
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect)
+[![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/javadoc.svg)](https://javadoc.io/doc/io.github.fike110/jeffect)
+
 The `Effects` class provides factory methods for creating Effect instances.
 
 ## Creation Methods
@@ -44,6 +47,26 @@ Effect<User> error = Effects.fail(new RuntimeException("Not found"));
 
 ---
 
+### attempt
+
+```java
+public static <T> Effect<T> attempt(Supplier<T> supplier)
+```
+
+Captures exceptions from normal Java code and turns them into an Effect.
+
+**Parameters:**
+- `supplier` - The throwing supplier to wrap
+
+**Returns:** An Effect containing the supplier's value or an error
+
+**Example:**
+```java
+Effect<Integer> effect = Effects.attempt(() -> Integer.parseInt("abc"));
+```
+
+---
+
 ### of(Supplier)
 
 ```java
@@ -84,6 +107,21 @@ Effect<Void> effect = Effects.of(() -> sendEmail());
 
 ---
 
+### run
+
+```java
+public static Effect<Void> run(Runnable runnable)
+```
+
+Executes a Runnable and returns an Effect that completes when done.
+
+**Parameters:**
+- `runnable` - The runnable to execute
+
+**Returns:** An Effect that completes when the runnable finishes
+
+---
+
 ### suspend
 
 ```java
@@ -96,6 +134,71 @@ Creates a suspended effect that evaluates the supplier when executed.
 - `supplier` - The supplier that produces an Effect
 
 **Returns:** A suspended Effect
+
+---
+
+### unit
+
+```java
+public static Effect<Void> unit()
+```
+
+Creates an effect that does nothing and returns nothing. Equivalent to `Effect<Void>`.
+
+**Returns:** A unit effect
+
+**Example:**
+```java
+Effect<Void> program = Effects.unit();
+```
+
+---
+
+### sleep
+
+```java
+public static Effect<Void> sleep(Duration duration)
+```
+
+Creates an effect that sleeps for the specified duration.
+
+**Parameters:**
+- `duration` - The duration to sleep
+
+**Returns:** An Effect that completes after the duration
+
+---
+
+### async
+
+```java
+public static <T> Effect<T> async(Consumer<Callback<T>> callback)
+public static <T> Effect<T> async(Consumer<Callback<T>> callback, Duration timeout)
+```
+
+Creates an async effect that runs a callback-based operation.
+
+**Parameters:**
+- `callback` - The consumer that receives a callback to complete the effect
+- `timeout` - (optional) Timeout duration
+
+**Returns:** An Effect containing the async result
+
+---
+
+### schedule
+
+```java
+public static <T> Effect<T> schedule(Duration delay, Supplier<Effect<T>> effect)
+```
+
+Creates an effect that runs on the scheduler after a delay.
+
+**Parameters:**
+- `delay` - The delay before execution
+- `effect` - The effect to run
+
+**Returns:** An Effect that runs after the delay
 
 ---
 

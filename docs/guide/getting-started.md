@@ -1,5 +1,8 @@
 # Getting Started
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect)
+[![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/javadoc.svg)](https://javadoc.io/doc/io.github.fike110/jeffect)
+
 Welcome to JEffect! This guide will help you get up and running quickly.
 
 ## What is JEffect?
@@ -24,14 +27,14 @@ Add the dependency to your project:
 
 ```xml [Maven]
 <dependency>
-    <groupId>com.github.fike110</groupId>
+    <groupId>io.github.fike110</groupId>
     <artifactId>jeffect</artifactId>
-    <version>1.0.0</version>
+    <version>0.1.1</version>
 </dependency>
 ```
 
 ```groovy [Gradle]
-implementation 'com.github.fike110:jeffect:1.0.0'
+implementation 'io.github.fike110:jeffect:0.1.1'
 ```
 
 :::
@@ -39,8 +42,8 @@ implementation 'com.github.fike110:jeffect:1.0.0'
 ## Your First Effect
 
 ```java
-import com.github.fike110.jeffect.Effects;
-import com.github.fike110.jeffect.core.Effect;
+import io.github.fike110.jeffect.Effects;
+import io.github.fike110.jeffect.core.Effect;
 
 public class Example {
     public static void main(String[] args) {

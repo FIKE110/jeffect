@@ -22,6 +22,94 @@ Creates a failed effect with an error:
 Effect<User> error = Effects.fail(new UserNotFoundException("User 1 not found"));
 ```
 
+## attempt
+
+`attempt` captures exceptions from normal Java code and turns them into an Effect.
+
+Normally in Java, code throws immediately:
+
+```java
+int x = Integer.parseInt("abc"); // throws exception
+```
+
+But in an effect system, we do not execute immediately. We capture the computation so it runs later:
+
+```java
+Effect<Integer> effect = Effects.attempt(() -> Integer.parseInt("abc"));
+```
+
+The exception is inside the effect, not thrown yet. When you run it:
+
+```java
+effect.runSync();
+```
+
+Then the error appears.
+
+### Why attempt is important
+
+It lets you safely wrap any Java code that might throw:
+
+```java
+Effect<String> readFile = Effects.attempt(() -> 
+    Files.readString(Path.of("file.txt"))
+);
+```
+
+Then you can handle errors functionally:
+
+```java
+Effect<String> safe = Effects.attempt(() -> Files.readString(Path.of("file.txt")))
+    .recover(e -> "default");
+```
+
+### Conceptual signature
+
+```
+attempt : () -> T  →  Effect<T>
+```
+
+## unit
+
+`unit` represents an effect that does nothing and returns nothing. It is equivalent to `Effect<Void>`:
+
+```java
+public static Effect<Void> unit() {
+    return Effects.success(null);
+}
+```
+
+### Why unit exists
+
+Sometimes you need an effect just for sequencing, not for returning a value:
+
+```java
+Effect<Void> program = Effects.run(() -> System.out.println("Hello"))
+    .then(Effects.unit());
+```
+
+Or inside loops:
+
+```java
+Effect<Void> repeat = Effects.unit().repeat(10);
+```
+
+### Real example
+
+```java
+Effect<Void> program = Effects.attempt(() -> Integer.parseInt("123"))
+    .tap(System.out::println)
+    .asUnit();
+
+program.runSync();
+// Output: 123
+```
+
+### Rule of thumb
+
+- Use `attempt` → when wrapping throwing code
+- Use `unit` → when you just need an empty effect
+
 ## From Suppliers
 
 ### of(Supplier)
@@ -117,6 +205,7 @@ Effect<Void> effect = Effects.of(() -> {
 |--------|----------|
 | `success(T)` | Immediate successful value |
 | `fail(Throwable)` | Immediate failure |
+| `attempt(Supplier<T>)` | Wrap risky code, capture exceptions |
 | `of(Supplier<T>)` | Deferred execution, auto-catches exceptions |
 | `suspend(Supplier<Effect<T>>)` | Suspended effect |
 | `tryCatch(Callable, Function)` | With custom error mapping |
@@ -124,9 +213,12 @@ Effect<Void> effect = Effects.of(() -> {
 | `fromFuture(CompletableFuture)` | From async future |
 | `fromRunnable(Runnable)` | From side-effect |
 | `fromCallable(Callable)` | From Callable |
+| `unit()` | Effect that does nothing |
 
 ## Best Practices
 
-1. **Use `of(Supplier)` for I/O** - It automatically catches exceptions
-2. **Use `success/fail` for known values** - No deferral overhead
-3. **Use `tryCatch` for error mapping** - When you need custom exceptions
+1. **Use `attempt` for throwing code** - Wraps exceptions into the effect
+2. **Use `of(Supplier)` for I/O** - It automatically catches exceptions
+3. **Use `success/fail` for known values** - No deferral overhead
+4. **Use `tryCatch` for error mapping** - When you need custom exceptions
+5. **Use `unit()` for sequencing** - When you need an empty effect

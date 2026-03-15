@@ -28,11 +28,14 @@ features:
     details: Map, flatMap, and monadic composition for elegant, readable code.
 ---
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect)
+[![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/javadoc.svg)](https://javadoc.io/doc/io.github.fike110/jeffect)
+
 ## Quick Example
 
 ```java
-import com.github.fike110.jeffect.Effects;
-import com.github.fike110.jeffect.core.Effect;
+import io.github.fike110.jeffect.Effects;
+import io.github.fike110.jeffect.core.Effect;
 
 // Create and transform
 Effect<String> result = Effects.of(() -> fetchUser(id))
@@ -49,14 +52,22 @@ String name = result.run();
 
 ```xml
 <dependency>
-    <groupId>com.github.fike110</groupId>
+    <groupId>io.github.fike110</groupId>
     <artifactId>jeffect</artifactId>
-    <version>1.0.0</version>
+    <version>0.1.1</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'com.github.fike110:jeffect:1.0.0'
+implementation 'io.github.fike110:jeffect:0.1.1'
 ```
+
+## API Reference
+
+For detailed API documentation, see:
+
+- [Effects Factory](/api/effects-factory) - Factory methods for creating effects
+- [Effect Interface](/api/effect-interface) - Core Effect interface methods
+- [Result Type](/api/result-type) - Result wrapper for effect execution
