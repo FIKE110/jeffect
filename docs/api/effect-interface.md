@@ -3,7 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect)
 [![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/javadoc.svg)](https://javadoc.io/doc/io.github.fike110/jeffect)
 
-The `Effect<T>` interface is the core type in JEffect. It represents a deferred computation that may succeed with a value of type `T` or fail with an exception.
+The `Effect&lt;T&gt;` interface is the core type in JEffect. It represents a deferred computation that may succeed with a value of type `T` or fail with an exception.
 
 ## Interface Methods
 
