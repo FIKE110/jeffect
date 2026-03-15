@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "JEffect Documentation",
   "scripts": {
-    "docs:dev": "vitepress dev . --port 3000",
-    "docs:build": "vitepress build .",
-    "docs:preview": "vitepress preview ."
+    "dev": "vitepress dev . --port 3000",
+    "build": "vitepress build .",
+    "preview": "vitepress preview ."
   },
   "keywords": ["jeffect", "java", "functional-programming"],
   "author": "",
