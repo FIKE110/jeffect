@@ -3,445 +3,300 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect)
 [![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/javadoc.svg)](https://javadoc.io/doc/io.github.fike110/jeffect)
 
-The `Effect&lt;T&gt;` interface is the core type in JEffect. It represents a deferred computation that may succeed with a value of type `T` or fail with an exception.
+The `Effect` interface is the core type in JEffect. It represents a deferred computation that may succeed with a value or fail with an exception.
 
-## Interface Methods
+## Transformation
 
-### Transformation
+### map
 
-#### map
-
-```java
-<R> Effect<R> map(Function<T, R> mapper)
-```
-
-Transforms the effect's value using the provided function. If the effect fails, the mapper is not applied.
+Transform the value:
 
 ```java
 Effect<Integer> result = Effects.success(5)
-    .map(i -> i * 2);  // Effect<Integer> containing 10
+    .map(i -> i * 2);  // Effect containing 10
 ```
 
-#### flatMap
+### flatMap
 
-```java
-<R> Effect<R> flatMap(Function<T, Effect<R>> mapper)
-```
-
-Chains two effects together, where the second effect depends on the result of the first.
+Chain effects:
 
 ```java
 Effect<String> result = Effects.success(5)
     .flatMap(i -> Effects.success("Number: " + i));
 ```
 
-#### tap
+### tap
 
-```java
-Effect<T> tap(Consumer<T> action)
-```
-
-Executes a side effect without changing the value.
+Execute side effects:
 
 ```java
 Effect<String> result = Effects.success("hello")
     .tap(System.out::println);  // Prints "hello"
 ```
 
-#### as
+### as
 
-```java
-<R> Effect<R> as(R value)
-```
-
-Replaces the effect's value with a new value.
+Replace the value:
 
 ```java
 Effect<String> result = Effects.success(5).as("done");
 ```
 
-#### asUnit
+### asUnit
 
-```java
-Effect<Void> asUnit()
-```
-
-Converts the effect to a unit effect (Effect<Void>).
+Convert to void:
 
 ```java
 Effect<Void> result = Effects.success("hello").asUnit();
 ```
 
-### Execution
+## Execution
 
-#### run / runSync
+### run / runSync
 
-```java
-T run()
-T runSync()
-```
-
-Executes the effect and returns the result, throwing if failed.
+Execute and return value or throw:
 
 ```java
 String result = effect.run();
 ```
 
-#### runSafe
+### runSafe
 
-```java
-Result<T> runSafe()
-```
-
-Executes the effect and returns a Result without throwing.
+Execute and return Result:
 
 ```java
 Result<String> result = effect.runSafe();
 ```
 
-#### runAsync
+### runAsync
 
-```java
-void runAsync()
-void runAsync(Executor executor)
-```
-
-Executes the effect asynchronously using the default executor or a custom executor.
+Execute asynchronously:
 
 ```java
 effect.runAsync();
 ```
 
-#### runFuture
+### runFuture
 
-```java
-CompletableFuture<T> runFuture()
-CompletableFuture<T> runFuture(Executor executor)
-```
-
-Executes the effect asynchronously and returns a CompletableFuture.
+Execute and return CompletableFuture:
 
 ```java
 CompletableFuture<String> future = effect.runFuture();
 ```
 
-### Error Handling
+## Error Handling
 
-#### recover
+### recover
 
-```java
-Effect<T> recover(Function<Throwable, T> handler)
-```
-
-Recovers from a failure by applying a handler function to the error.
+Handle errors with fallback:
 
 ```java
 Effect<User> user = Effects.of(() -> findUser(id))
     .recover(e -> User.anonymous());
 ```
 
-#### recoverWith
+### recoverWith
 
-```java
-Effect<T> recoverWith(Function<Throwable, Effect<T>> handler)
-```
-
-Recovers from a failure by applying a handler function that returns an Effect.
+Handle errors with new Effect:
 
 ```java
 Effect<User> user = Effects.of(() -> findUser(id))
     .recoverWith(e -> Effects.success(User.anonymous()));
 ```
 
-#### orElse
+### orElse
 
-```java
-Effect<T> orElse(Supplier<Effect<T>> fallback)
-T orElseGet(Supplier<T> defaultValue)
-```
-
-Returns this effect if successful, otherwise returns the fallback effect.
+Provide fallback:
 
 ```java
 Effect<String> result = effect.orElse(Effects.success("default"));
 ```
 
-#### onError
+### onError
 
-```java
-Effect<T> onError(Consumer<Throwable> action)
-```
-
-Executes a side effect when an error occurs.
+Side effect on error:
 
 ```java
 Effect<String> result = effect.onError(e -> log.error("Error", e));
 ```
 
-### Looping
+## Looping
 
-#### retry
+### retry
 
-```java
-Effect<T> retry(int retries)
-```
-
-Retries the effect up to N times on failure.
+Retry on failure:
 
 ```java
 Effect<User> user = Effects.of(() -> fetchUser(id))
     .retry(3);
 ```
 
-#### repeat
+### repeat
 
-```java
-Effect<Void> repeat(int times)
-```
-
-Repeats the effect N times.
+Repeat N times:
 
 ```java
 Effect<Void> repeated = Effects.unit().repeat(5);
 ```
 
-#### forever
+### forever
 
-```java
-Effect<T> forever()
-```
-
-Repeats the effect forever.
+Repeat forever:
 
 ```java
 Effect<Void> forever = Effects.unit().forever();
 ```
 
-### Time
+## Time
 
-#### delay
+### delay
 
-```java
-Effect<T> delay(Duration duration)
-```
-
-Delays execution of this effect by the specified duration.
+Delay execution:
 
 ```java
 Effect<String> delayed = Effects.success("hello")
     .delay(Duration.ofSeconds(2));
 ```
 
-#### sleep
+### sleep
 
-```java
-Effect<T> sleep(Duration duration)
-```
-
-Sleeps for the specified duration then returns the result.
+Sleep before execution:
 
 ```java
 Effect<String> slept = effect.sleep(Duration.ofSeconds(1));
 ```
 
-#### timeout
+### timeout
 
-```java
-Effect<T> timeout(Duration duration)
-```
-
-Times out the effect if it takes too long.
+Timeout execution:
 
 ```java
 Effect<User> user = Effects.of(() -> fetchUser(id))
     .timeout(Duration.ofSeconds(5));
 ```
 
-### Concurrency
+## Concurrency
 
-#### fork
+### fork
 
-```java
-Effect<Fiber<T>> fork()
-```
-
-Forks the effect to run concurrently, returning a Fiber.
+Fork to run concurrently:
 
 ```java
 Effect<Fiber<String>> forked = effect.fork();
 ```
 
-#### join
+### join
 
-```java
-Effect<T> join(Fiber<T> fiber)
-```
-
-Joins the result of a forked fiber.
+Join a forked fiber:
 
 ```java
 String result = forked.run().join().run();
 ```
 
-#### interrupt
+### interrupt
 
-```java
-Effect<Void> interrupt(Fiber<?> fiber)
-```
-
-Interrupts a running fiber.
+Interrupt a fiber:
 
 ```java
 effect.fork().run().interrupt();
 ```
 
-#### race
+### race
 
-```java
-Effect<T> race(Effect<T> other)
-```
-
-Runs this effect and another effect in parallel, returning the first to succeed.
+Race with another effect:
 
 ```java
 Effect<String> winner = Effects.success("fast")
     .race(Effects.success("slow"));
 ```
 
-### Combination
+## Combination
 
-#### then
+### then
 
-```java
-<R> Effect<R> then(Effect<R> next)
-```
-
-Sequences effects - runs this effect then the next.
+Sequence effects:
 
 ```java
 Effect<Void> program = Effects.success("hello")
     .then(Effects.success("world"));
 ```
 
-#### zip
+### zip
 
-```java
-Effect<Pair<T, U>> zip(Effect<U> other)
-```
-
-Combines two effects into one containing a Pair.
+Combine two effects:
 
 ```java
 Effect<Pair<String, Integer>> zipped = Effects.success("hello")
     .zip(Effects.success(42));
 ```
 
-#### zipWith
+### zipWith
 
-```java
-<U, R> Effect<R> zipWith(Effect<U> other, BiFunction<T, U, R> combiner)
-```
-
-Combines two effects using a function.
+Combine with function:
 
 ```java
 Effect<String> combined = Effects.success("hello")
     .zipWith(Effects.success(42), (a, b) -> a + b);
 ```
 
-### Logging
+## Logging
 
-#### log / logInfo / logWarn / logError
+### log / logInfo / logWarn / logError
 
-```java
-Effect<T> log()
-Effect<T> logDebug()
-Effect<T> logInfo()
-Effect<T> logWarn()
-Effect<T> logError()
-Effect<T> logFatal()
-```
-
-Logs the value with optional prefixes.
+Log values:
 
 ```java
 Effect<String> logged = effect.logInfo();
 ```
 
-### Other
+## Other
 
-#### peek
+### peek
 
-```java
-Effect<T> peek(Consumer<T> action)
-```
-
-Executes a side effect and returns the original value.
+Side effect:
 
 ```java
 Effect<String> peeked = effect.peek(v -> System.out.println("Value: " + v));
 ```
 
-#### ignore
+### ignore
 
-```java
-Effect<Void> ignore()
-```
-
-Discards the value and returns void.
+Discard value:
 
 ```java
 Effect<Void> ignored = effect.ignore();
 ```
 
-#### memoize / cached
+### memoize / cached
 
-```java
-Effect<T> memoize()
-Effect<T> cached()
-```
-
-Caches the result of the effect.
+Cache result:
 
 ```java
 Effect<T> cached = effect.memoize();
 ```
 
-#### defer
+### defer
 
-```java
-Effect<T> defer(Runnable cleanup)
-```
-
-Runs cleanup after the effect completes.
+Run cleanup after:
 
 ```java
 Effect<T> deferred = effect.defer(() -> cleanup());
 ```
 
-### Static Methods
+## Static Methods
 
-#### collect / all
+### collect / all
 
-```java
-static <T> Effect<List<T>> collect(List<Effect<T>> effects)
-static <T> Effect<List<T>> all(List<Effect<T>> effects)
-```
-
-Sequences a list of effects into a single effect containing a list.
-
-#### parAll
+Sequence list of effects:
 
 ```java
-static <T> Effect<List<T>> parAll(List<Effect<T>> effects)
+Effect<List<T>> collected = Effect.collect(effects);
 ```
 
-Runs a list of effects in parallel.
+### parAll
 
-#### race
+Parallel execution:
 
 ```java
-static <T> Effect<T> race(Effect<T> a, Effect<T> b)
+Effect<List<T>> parallel = Effect.parAll(effects);
 ```
-
-Races two effects, returning the first to complete.
