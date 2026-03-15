@@ -1,15 +1,18 @@
 package io.github.fike110.jeffect;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import io.github.fike110.jeffect.core.Effect;
@@ -204,6 +207,161 @@ public final class Effects {
      */
     public static <T> Effect<T> fail(Throwable throwable) {
         return new Fail<>(throwable);
+    }
+
+    /**
+     * Captures exceptions from normal Java code and turns them into an Effect.
+     * Unlike {@link #of(Supplier)} which catches exceptions automatically,
+     * this method explicitly wraps throwing code.
+     * 
+     * @param supplier the throwing supplier to wrap
+     * @param <T> the type of value produced
+     * @return an Effect containing the supplier's value or an error
+     */
+    public static <T> Effect<T> attempt(Supplier<T> supplier) {
+        return new Suspend<>(() -> {
+            try {
+                return Effects.success(supplier.get());
+            } catch (Throwable e) {
+                return Effects.fail(e);
+            }
+        });
+    }
+
+    /**
+     * Executes a Runnable and returns an Effect that completes when done.
+     * 
+     * @param runnable the runnable to execute
+     * @return an Effect that completes when the runnable finishes
+     */
+    public static Effect<Void> run(Runnable runnable) {
+        return new Suspend<>(() -> {
+            try {
+                runnable.run();
+                return Effects.success(null);
+            } catch (Throwable e) {
+                return Effects.fail(e);
+            }
+        });
+    }
+
+    /**
+     * Creates an effect that does nothing and returns nothing.
+     * Equivalent to {@code Effect<Void>}.
+     * 
+     * @return a unit effect
+     */
+    public static Effect<Void> unit() {
+        return new Pure<>(null);
+    }
+
+    /**
+     * Creates an effect that sleeps for the specified duration.
+     * 
+     * @param duration the duration to sleep
+     * @return an Effect that completes after the duration
+     */
+    public static Effect<Void> sleep(Duration duration) {
+        return new Suspend<>(() -> {
+            try {
+                Thread.sleep(duration.toMillis());
+                return Effects.success(null);
+            } catch (Throwable e) {
+                return Effects.fail(e);
+            }
+        });
+    }
+
+    /**
+     * Callback interface for async operations.
+     * 
+     * @param <T> the type of result
+     */
+    @FunctionalInterface
+    public interface Callback<T> {
+        void accept(T result, Throwable error);
+    }
+
+    /**
+     * Creates an async effect that runs a callback-based operation.
+     * 
+     * @param callback the consumer that receives a callback to complete the effect
+     * @param <T> the type of result
+     * @return an Effect containing the async result
+     */
+    public static <T> Effect<T> async(Consumer<Callback<T>> callback) {
+        return new Suspend<>(() -> {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            callback.accept((result, error) -> {
+                if (error != null) {
+                    future.completeExceptionally(error);
+                } else {
+                    future.complete(result);
+                }
+            });
+            try {
+                return Effects.success(future.get());
+            } catch (Throwable e) {
+                return Effects.fail(e);
+            }
+        });
+    }
+
+    /**
+     * Creates an async effect that runs a callback-based operation with a timeout.
+     * 
+     * @param callback the consumer that receives a callback to complete the effect
+     * @param timeout the timeout duration
+     * @param <T> the type of result
+     * @return an Effect containing the async result
+     */
+    public static <T> Effect<T> async(Consumer<Callback<T>> callback, Duration timeout) {
+        return new Suspend<>(() -> {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            callback.accept((result, error) -> {
+                if (error != null) {
+                    future.completeExceptionally(error);
+                } else {
+                    future.complete(result);
+                }
+            });
+            try {
+                return Effects.success(future.get(timeout.toMillis(), TimeUnit.MILLISECONDS));
+            } catch (Throwable e) {
+                return Effects.fail(e);
+            }
+        });
+    }
+
+    /**
+     * Creates an effect that runs on the scheduler after a delay.
+     * 
+     * @param delay the delay before execution
+     * @param effect the effect to run
+     * @param <T> the type of result
+     * @return an Effect that runs after the delay
+     */
+    public static <T> Effect<T> schedule(Duration delay, Supplier<Effect<T>> effect) {
+        return new Suspend<>(() -> {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            scheduler.schedule(() -> {
+                try {
+                    Result<T> result = EffectRuntime.run(effect.get());
+                    if (result.isFailure()) {
+                        future.completeExceptionally(result.getThrowable());
+                    } else {
+                        future.complete(result.get());
+                    }
+                } catch (Throwable e) {
+                    future.completeExceptionally(e);
+                }
+            }, delay.toMillis(), TimeUnit.MILLISECONDS);
+            try {
+                return Effects.success(future.get());
+            } catch (Throwable e) {
+                return Effects.fail(e);
+            }
+        });
     }
 
     /**

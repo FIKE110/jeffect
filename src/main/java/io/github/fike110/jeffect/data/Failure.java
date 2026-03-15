@@ -3,10 +3,32 @@ package io.github.fike110.jeffect.data;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Represents a failed result containing an error.
+ * 
+ * <p>Failure is one of the two variants of {@link Result}, representing
+ * a computation that failed with an exception.</p>
+ * 
+ * <h2>Usage</h2>
+ * <pre>{@code
+ * Result<String> result = Results.failure(new RuntimeException("error"));
+ * if (result.isFailure()) {
+ *     System.out.println(result.getThrowable()); // prints the error
+ * }
+ * }</pre>
+ * 
+ * @param <T> the type parameter (value is never present)
+ */
 public final class Failure<T> implements Result<T>{
 
+    /** The error that caused the failure */
     private final Throwable error;
 
+    /**
+     * Creates a Failure with the given error.
+     * 
+     * @param error the error that caused the failure
+     */
     public Failure(Throwable error) {
         this.error = error;
     }

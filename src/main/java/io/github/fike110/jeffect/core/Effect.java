@@ -1,6 +1,7 @@
 package io.github.fike110.jeffect.core;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
@@ -111,6 +112,17 @@ public sealed interface Effect<T> permits Pure,Fail,Suspend,FlatMap,Recover{
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Alias for {@link #run()}.
+     * Executes the effect synchronously and returns the result.
+     * 
+     * @return the result value
+     * @throws RuntimeException if the effect fails
+     */
+    default T runSync() {
+        return run();
     }
 
     /**
@@ -520,18 +532,141 @@ public sealed interface Effect<T> permits Pure,Fail,Suspend,FlatMap,Recover{
         });
     }
 
+    /**
+     * Replaces the effect's value with a new value.
+     * 
+     * <pre>{@code
+     * Effect<Integer> effect = Effects.success(5);
+     * Effect<String> result = effect.as("done");  // Effect<String> containing "done"
+     * }</pre>
+     * 
+     * @param value the new value
+     * @param <R> the new type
+     * @return a new Effect with the new value
+     */
+    default <R> Effect<R> as(R value) {
+        return map(v -> value);
+    }
+
+    /**
+     * Converts this effect to a unit effect (Effect<Void>).
+     * Discards the value and returns null.
+     * 
+     * <pre>{@code
+     * Effect<Integer> effect = Effects.success(5);
+     * Effect<Void> unit = effect.asUnit();  // Effect<Void> containing null
+     * }</pre>
+     * 
+     * @return a unit Effect
+     */
+    default Effect<Void> asUnit() {
+        return map(v -> (Void) null);
+    }
+
     default Effect<T> tapError(Consumer<Throwable> action) {
         return recoverWith(err -> {
             action.accept(err);
             return Effects.fail(err);
         });
     }
+
     default Effect<T> peek(Consumer<T> action) {
         return Effects.of(() -> {
             T result = this.run(); // execute the effect
             action.accept(result);     // run side effect
             return result;             // return original value unchanged
         });
+    }
+
+    /**
+     * Sequences a list of effects into a single effect containing a list.
+     * 
+     * <pre>{@code
+     * List<Effect<String>> effects = List.of(
+     *     Effects.success("a"),
+     *     Effects.success("b")
+     * );
+     * Effect<List<String>> result = Effect.collect(effects);
+     * }</pre>
+     * 
+     * @param effects the list of effects to collect
+     * @param <T> the type of the effect values
+     * @return an Effect containing a list of all values
+     */
+    static <T> Effect<List<T>> collect(List<Effect<T>> effects) {
+        return Effects.sequence(effects);
+    }
+
+    /**
+     * Runs this effect and another effect in parallel, returning the first to succeed.
+     * 
+     * <pre>{@code
+     * Effect<String> result = Effects.success("fast")
+     *     .race(Effects.success("slow"));
+     * }</pre>
+     * 
+     * @param other the other effect to race
+     * @return an Effect containing the first result to complete
+     */
+    default Effect<T> race(Effect<T> other) {
+        return Effects.race(this, other);
+    }
+
+    /**
+     * Repeats this effect forever.
+     * 
+     * <pre>{@code
+     * Effect<Void> forever = Effects.unit().forever();
+     * }</pre>
+     * 
+     * @return an Effect that repeats forever
+     */
+    default Effect<T> forever() {
+        return this.flatMap(v -> new Suspend<>(() -> this.forever()));
+    }
+
+    /**
+     * Joins the result of a forked fiber.
+     * 
+     * @param fiber the fiber to join
+     * @return an Effect containing the fiber's result
+     */
+    default Effect<T> join(Fiber<T> fiber) {
+        return fiber.join();
+    }
+
+    /**
+     * Interrupts a running fiber.
+     * 
+     * @param fiber the fiber to interrupt
+     * @return an Effect that completes when the fiber is interrupted
+     */
+    default Effect<Void> interrupt(Fiber<?> fiber) {
+        return fiber.cancel();
+    }
+
+    /**
+     * Sequences a list of effects into a single effect containing a list.
+     * Alias for {@link #collect(List)}.
+     * 
+     * @param effects the list of effects to sequence
+     * @param <T> the type of the effect values
+     * @return an Effect containing a list of all values
+     */
+    static <T> Effect<List<T>> all(List<Effect<T>> effects) {
+        return Effects.sequence(effects);
+    }
+
+    /**
+     * Runs a list of effects in parallel, returning all results.
+     * Alias for {@link Effects#parallel(List)}.
+     * 
+     * @param effects the list of effects to run in parallel
+     * @param <T> the type of the effect values
+     * @return an Effect containing a list of all results
+     */
+    static <T> Effect<List<T>> parAll(List<Effect<T>> effects) {
+        return Effects.parallel(effects);
     }
 
     default Fiber<T> schedule(Duration initialDelay, Duration interval) {

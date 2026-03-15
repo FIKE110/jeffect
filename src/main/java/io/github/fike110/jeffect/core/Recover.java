@@ -2,6 +2,8 @@ package io.github.fike110.jeffect.core;
 
 import java.util.function.Function;
 
+import io.github.fike110.jeffect.Effects;
+
 /**
  * Represents error recovery for an Effect.
  * 
@@ -51,6 +53,6 @@ public final class Recover<T> implements Effect<T> {
 
     @Override
     public <R> Effect<R> flatMap(Function<T, Effect<R>> mapper) {
-        return null;
+        return new FlatMap<>(this, mapper);
     }
 }
