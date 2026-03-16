@@ -5,8 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="84d47516-eb3a-4c7b-a402-e1c28a2ac46e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/.vitepress/config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/docs/.vitepress/config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/creating-effects.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/creating-effects.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/guide/getting-started.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/getting-started.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/fike110/jeffect/Effects.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/fike110/jeffect/Effects.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/fike110/jeffect/core/EffectRuntime.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/fike110/jeffect/core/EffectRuntime.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/EffectTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/EffectTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,12 +57,17 @@
   "keyToString": {
     "Application.Main.executor": "Run",
     "JUnit.EffectTest.executor": "Run",
+    "JUnit.EffectTest.testAsUnitThenMap.executor": "Run",
     "JUnit.EffectTest.testMapExceptionOnFail.executor": "Run",
     "JUnit.EffectTest.testSucceedEffect.executor": "Run",
     "JUnit.EffectTest.testSucceedEffectWithResult.executor": "Run",
+    "JUnit.EffectTest.testTryCatchRunnable.executor": "Run",
+    "JUnit.EffectTest.testTryCatchRunnableMapsException.executor": "Run",
+    "JUnit.EffectTest.testTryCatchRunnbaleMapsException.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/home/fortune/Documents/projects/jeffect/pom.xml",
     "node.js.detected.package.eslint": "true",
@@ -68,22 +83,9 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.Main">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.github.fike110.Main" />
-      <module name="effektj" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.github.fike110.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.EffectTest.testAsUnitThenMap">
     <configuration name="EffectTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="effektj" />
+      <module name="jeffect" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="EffectTest" />
       <option name="TEST_OBJECT" value="class" />
@@ -91,43 +93,53 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="EffectTest.testMapExceptionOnFail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="effektj" />
+    <configuration name="EffectTest.testAsUnitThenMap" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="jeffect" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="EffectTest" />
-      <option name="METHOD_NAME" value="testMapExceptionOnFail" />
+      <option name="METHOD_NAME" value="testAsUnitThenMap" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="EffectTest.testSucceedEffect" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="effektj" />
+    <configuration name="EffectTest.testTryCatchRunnable" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="jeffect" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="EffectTest" />
-      <option name="METHOD_NAME" value="testSucceedEffect" />
+      <option name="METHOD_NAME" value="testTryCatchRunnable" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="docs:dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/docs/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="docs:dev" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
-      <method v="2" />
+    <configuration name="EffectTest.testTryCatchRunnableMapsException" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="jeffect" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="EffectTest" />
+      <option name="METHOD_NAME" value="testTryCatchRunnableMapsException" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EffectTest.testTryCatchRunnbaleMapsException" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="jeffect" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="EffectTest" />
+      <option name="METHOD_NAME" value="testTryCatchRunnbaleMapsException" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.docs:dev" />
-        <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.EffectTest.testAsUnitThenMap" />
+        <item itemvalue="JUnit.EffectTest.testTryCatchRunnable" />
         <item itemvalue="JUnit.EffectTest" />
-        <item itemvalue="JUnit.EffectTest.testSucceedEffect" />
-        <item itemvalue="JUnit.EffectTest.testMapExceptionOnFail" />
+        <item itemvalue="JUnit.EffectTest.testTryCatchRunnableMapsException" />
+        <item itemvalue="JUnit.EffectTest.testTryCatchRunnbaleMapsException" />
       </list>
     </recent_temporary>
   </component>
@@ -163,6 +175,7 @@
       <workItem from="1773608144212" duration="124000" />
       <workItem from="1773609199515" duration="244000" />
       <workItem from="1773609449037" duration="136000" />
+      <workItem from="1773676741981" duration="3070000" />
     </task>
     <servers />
   </component>

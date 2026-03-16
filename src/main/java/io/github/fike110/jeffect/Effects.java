@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import io.github.fike110.jeffect.core.Deferred;
 import io.github.fike110.jeffect.core.Effect;
 import io.github.fike110.jeffect.core.EffectRuntime;
 import io.github.fike110.jeffect.core.Fail;
@@ -179,6 +180,18 @@ public final class Effects {
         return new Suspend<>(() -> {
             try {
                 return Effects.success(action.call());
+            } catch (Throwable e) {
+                return Effects.fail(mapper.apply(e));
+            }
+        });
+    }
+
+
+    public static <T> Effect<Void> tryCatch(Runnable action, Function<Throwable, ? extends Throwable> mapper) {
+        return new Suspend<>(() -> {
+            try {
+                action.run();
+                return Effects.unit();
             } catch (Throwable e) {
                 return Effects.fail(mapper.apply(e));
             }
@@ -464,6 +477,52 @@ public final class Effects {
             } catch (Throwable e) {
                 return Effects.fail(e);
             }
+        });
+    }
+
+    /**
+     * Creates a deferred effect that takes an input and returns a result.
+     * The effect is not executed until {@code run(input)} or {@code supply(input)} is called.
+     * 
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * Deferred<User, String> getName = Effects.effectOf(user -> user.getName());
+     * String name = getName.run(user);
+     * 
+     * Deferred<User, Integer> getAge = Effects.effectOf(User::getAge);
+     * int age = getAge.run(user);
+     * }</pre>
+     * 
+     * @param <T> the input type
+     * @param <R> the result type
+     * @param fn the function to apply to the input
+     * @return a Deferred that can be executed later with an input
+     */
+    public static <T, R> Deferred<T, R> effectOf(Function<T, R> fn) {
+        return input -> Effects.of(() -> fn.apply(input));
+    }
+
+    /**
+     * Creates a deferred effect for side-effects (void actions) that takes an input.
+     * The effect returns {@code Effect<Void>} and is useful for actions that don't return a value.
+     * 
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * Deferred<User, Void> printUser = Effects.effectOfVoid(user -> System.out.println(user));
+     * printUser.run(user);
+     * 
+     * Deferred<User, Void> saveUser = Effects.effectOfVoid(user -> repository.save(user));
+     * saveUser.run(user);
+     * }</pre>
+     * 
+     * @param <T> the input type
+     * @param action the consumer to execute with the input
+     * @return a Deferred that executes the action when supplied with input
+     */
+    public static <T> Deferred<T, Void> effectOfVoid(Consumer<T> action) {
+        return input -> Effects.of(() -> {
+            action.accept(input);
+            return (Void) null;
         });
     }
 

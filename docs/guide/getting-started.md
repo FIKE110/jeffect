@@ -29,12 +29,12 @@ Add the dependency to your project:
 <dependency>
     <groupId>io.github.fike110</groupId>
     <artifactId>jeffect</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
 </dependency>
 ```
 
 ```groovy [Gradle]
-implementation 'io.github.fike110:jeffect:0.1.1'
+implementation 'io.github.fike110:jeffect:0.1.2'
 ```
 
 :::

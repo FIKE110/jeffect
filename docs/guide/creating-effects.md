@@ -199,6 +199,47 @@ Effect<Void> effect = Effects.of(() -> {
 });
 ```
 
+## Deferred Effects
+
+Deferred effects let you define a computation that takes input at execution time, similar to partial application:
+
+### effectOf
+
+Creates a deferred effect from a function:
+
+```java
+// Takes input when executed
+Deferred<User, String> getName = Effects.effectOf(user -> user.getName());
+String name = getName.run(user);
+
+Deferred<User, Integer> getAge = Effects.effectOf(User::getAge);
+int age = getAge.run(user);
+```
+
+### effectOfVoid
+
+Creates a deferred void effect for side-effects:
+
+```java
+Deferred<User, Void> printUser = Effects.effectOfVoid(user -> System.out.println(user));
+printUser.run(user);
+
+Deferred<User, Void> saveUser = Effects.effectOfVoid(user -> repository.save(user));
+saveUser.run(user);
+```
+
+### Chaining Deferred
+
+Deferred supports `map`, `flatMap`, `tap`, and `recover`:
+
+```java
+Deferred<String, Integer> length = Effects.effectOf(String::length)
+    .map(len -> len * 2);  // Transform result
+    
+Deferred<String, String> upper = Effects.effectOf(String::toUpperCase)
+    .flatMap(s -> Effects.effectOf(s2 -> s + "!"));  // Chain deferreds
+```
+
 ## Factory Methods Summary
 
 | Method | Use Case |
@@ -214,6 +255,8 @@ Effect<Void> effect = Effects.of(() -> {
 | `fromRunnable(Runnable)` | From side-effect |
 | `fromCallable(Callable)` | From Callable |
 | `unit()` | Effect that does nothing |
+| `effectOf(Function<T,R>)` | Deferred effect (takes input at run time) |
+| `effectOfVoid(Consumer<T>)` | Deferred void effect |
 
 ## Best Practices
 

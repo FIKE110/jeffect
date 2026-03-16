@@ -49,7 +49,7 @@ public final class EffectRuntime {
                 Effect<Object> source = (Effect<Object>) flat.source();
                 Function<Object, Effect<T>> f = (Function<Object, Effect<T>>) flat.f();
 
-                if (source instanceof Suspend<Object> s) {
+                while (source instanceof Suspend<Object> s) {
                     source = s.thunk().get();
                 }
 
@@ -57,6 +57,10 @@ public final class EffectRuntime {
                     effect = f.apply(p.value());
                 } else if (source instanceof Fail<Object> failSource) {
                     return Results.failure(failSource.error());
+                } else if (source instanceof FlatMap<?, ?> nestedFlat) {
+                    Effect<Object> nestedSource = (Effect<Object>) nestedFlat.source();
+                    Function<Object, Effect<Object>> nestedF = (Function<Object, Effect<Object>>) nestedFlat.f();
+                    effect = new FlatMap<>(nestedSource, x -> nestedF.apply(x).flatMap(f));
                 } else {
                     effect = new FlatMap<>(source, f);
                 }

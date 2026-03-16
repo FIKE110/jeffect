@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Test;
 
 import io.github.fike110.jeffect.Effects;
+import io.github.fike110.jeffect.core.Deferred;
 import io.github.fike110.jeffect.core.Effect;
 import io.github.fike110.jeffect.data.Result;
 
@@ -214,6 +215,27 @@ public class EffectTest {
         assertEquals(42, effect.run());
     }
 
+
+    @Test
+    void testTryCatchRunnable() {
+        Effect<Void> effect = Effects.tryCatch(
+                () -> System.out.println(),
+                e -> new RuntimeException("mapped")
+        );
+        assertTrue(effect.runSafe().isSuccess());
+    }
+
+    @Test
+    void testTryCatchRunnableMapsException() {
+        Effect<Void> effect = Effects.tryCatch(
+                () -> { throw new IllegalArgumentException("original"); },
+                e -> new RuntimeException("mapped")
+        );
+        Result<Void> result = effect.runSafe();
+        assertTrue(result.isFailure());
+        assertEquals("mapped", result.getThrowable().getMessage());
+    }
+
     @Test
     void testTryCatchMapsException() {
         Effect<Integer> effect = Effects.tryCatch(
@@ -339,5 +361,62 @@ public class EffectTest {
 
         Effect<Integer> fail = Effects.<Integer>fail(new RuntimeException("error"));
         assertEquals(100, fail.orElseGet(() -> 100));
+    }
+
+    @Test
+    void testAsUnitThenMap() {
+        var r = Effects.runSafe(Effects.tryCatch(
+            () -> 2,
+            (e) -> new RuntimeException(e)
+        ).asUnit().map(e -> e));
+        
+        assertTrue(r.isSuccess());
+        assertNull(r.get());
+    }
+
+    @Test
+    void testDeferredEffectOf() {
+        Deferred<String, Integer> length = Effects.effectOf(s -> s.length());
+        
+        assertEquals(5, length.run("hello"));
+        assertEquals(3, length.run("abc"));
+    }
+
+    @Test
+    void testDeferredEffectOfVoid() {
+        AtomicInteger counter = new AtomicInteger(0);
+        Deferred<String, Void> increment = Effects.effectOfVoid(s -> counter.incrementAndGet());
+        
+        increment.run("test");
+        assertEquals(1, counter.get());
+        
+        increment.run("test2");
+        assertEquals(2, counter.get());
+    }
+
+    @Test
+    void testDeferredMap() {
+        Deferred<String, Integer> length = Effects.effectOf(String::length)
+            .map(len -> len * 2);
+        
+        assertEquals(10, length.run("hello"));
+    }
+
+    @Test
+    void testDeferredFlatMap() {
+        Deferred<String, Deferred<String, String>> deferred = Effects.effectOf(s -> Effects.effectOf(s2 -> s + s2));
+        
+        assertEquals("helloabc", deferred.run("hello").run("abc"));
+    }
+
+    @Test
+    void testDeferredRecover() {
+        Deferred<String, Integer> throwsOnNull = Effects.<String, Integer>effectOf(s -> {
+            if (s == null) throw new RuntimeException("null not allowed");
+            return s.length();
+        }).recover(e -> 0);
+        
+        assertEquals(5, throwsOnNull.run("hello"));
+        assertEquals(0, throwsOnNull.run(null));
     }
 }

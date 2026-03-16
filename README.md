@@ -13,14 +13,14 @@ A functional effect library for Java that provides deferred computation with ele
 <dependency>
     <groupId>io.github.fike110</groupId>
     <artifactId>jeffect</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'io.github.fike110:jeffect:0.1.1'
+implementation 'io.github.fike110:jeffect:0.1.2'
 ```
 
 ## Quick Start
@@ -99,6 +99,24 @@ Effect<Data> data = Effects.tryCatch(
     () -> fetchData(),
     e -> new CustomException("Failed to fetch", e)
 );
+```
+
+### Deferred Effects (Partial Application)
+
+Deferred effects let you define a computation that takes input at execution time:
+
+```java
+// Create a deferred effect - takes input when run
+Deferred<User, String> getName = Effects.effectOf(user -> user.getName());
+String name = getName.run(user);
+
+// For void effects (side effects)
+Deferred<User, Void> printUser = Effects.effectOfVoid(user -> System.out.println(user));
+printUser.run(user);
+
+// Deferred supports chaining
+Deferred<String, Integer> length = Effects.effectOf(String::length)
+    .map(len -> len * 2);  // transform result
 ```
 
 ### From Optional, Future, etc.
@@ -482,6 +500,8 @@ public class NotificationService {
 | `when(boolean, Effect)` | Conditional returning Optional |
 | `using(Effect, Function, Function)` | Resource management |
 | `cachedFunction(Function)` | Memoizes function results |
+| `effectOf(Function<T,R>)` | Creates deferred effect |
+| `effectOfVoid(Consumer<T>)` | Creates deferred void effect |
 
 ### Effect Instance Methods
 

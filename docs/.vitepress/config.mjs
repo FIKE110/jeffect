@@ -40,6 +40,7 @@ export default defineConfig({
           items: [
             { text: 'Effects Factory', link: '/api/effects-factory' },
             { text: 'Effect Interface', link: '/api/effect-interface' },
+            { text: 'Deferred Type', link: '/api/deferred-type' },
             { text: 'Result Type', link: '/api/result-type' }
           ]
         }
