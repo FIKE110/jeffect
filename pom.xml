@@ -116,6 +116,15 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <batchMode>true</batchMode>
+                    <useAgent>false</useAgent>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                    <passphrase>${env.GPG_PASSPHRASE}</passphrase>
+                </configuration>
             </plugin>
 
            <plugin>

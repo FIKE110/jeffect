@@ -5,16 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="84d47516-eb3a-4c7b-a402-e1c28a2ac46e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/.vitepress/config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/docs/.vitepress/config.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/api/effect-interface.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/api/effect-interface.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/api/effects-factory.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/api/effects-factory.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/api/result-type.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/api/result-type.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/guide/getting-started.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/guide/getting-started.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/fike110/jeffect/core/Effect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/fike110/jeffect/core/Effect.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +166,7 @@
       <workItem from="1773609449037" duration="136000" />
       <workItem from="1773676741981" duration="3070000" />
       <workItem from="1773810479186" duration="23000" />
-      <workItem from="1773991317283" duration="7072000" />
+      <workItem from="1773991317283" duration="7386000" />
     </task>
     <servers />
   </component>
