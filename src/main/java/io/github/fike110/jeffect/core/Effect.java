@@ -114,16 +114,6 @@ public sealed interface Effect<T> permits Pure,Fail,Suspend,FlatMap,Recover{
         }
     }
 
-    /**
-     * Alias for {@link #run()}.
-     * Executes the effect synchronously and returns the result.
-     * 
-     * @return the result value
-     * @throws RuntimeException if the effect fails
-     */
-    default T runSync() {
-        return run();
-    }
 
     /**
      * Delays execution of this effect by the specified duration.

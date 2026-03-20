@@ -13,7 +13,7 @@ export default defineConfig({
       { text: 'API', link: '/api/effects-factory' },
       { 
         text: 'Javadoc', 
-        link: 'https://javadoc.io/doc/io.github.fike110/jeffect/0.1.3',
+        link: 'https://javadoc.io/doc/io.github.fike110/jeffect/0.1.4',
         target: '_blank'
       },
       { text: 'GitHub', link: 'https://github.com/fike110/jeffect', target: '_blank' }
@@ -41,7 +41,8 @@ export default defineConfig({
             { text: 'Effects Factory', link: '/api/effects-factory' },
             { text: 'Effect Interface', link: '/api/effect-interface' },
             { text: 'Deferred Type', link: '/api/deferred-type' },
-            { text: 'Result Type', link: '/api/result-type' }
+            { text: 'Result Type', link: '/api/result-type' },
+            { text: 'State Module', link: '/api/state-type' }
           ]
         }
       ]

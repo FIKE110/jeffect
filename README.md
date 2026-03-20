@@ -1,7 +1,7 @@
 # JEffect
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect/0.1.3.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect/0.1.3)
-[![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/0.1.3.svg)](https://javadoc.io/doc/io.github.fike110/jeffect/0.1.3)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect/0.1.4.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect/0.1.4)
+[![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/0.1.4.svg)](https://javadoc.io/doc/io.github.fike110/jeffect/0.1.4)
 
 A functional effect library for Java that provides deferred computation with elegant error handling.
 
@@ -13,14 +13,14 @@ A functional effect library for Java that provides deferred computation with ele
 <dependency>
     <groupId>io.github.fike110</groupId>
     <artifactId>jeffect</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'io.github.fike110:jeffect:0.1.3'
+implementation 'io.github.fike110:jeffect:0.1.4'
 ```
 
 ## Quick Start
@@ -403,6 +403,108 @@ Effect<User> user = Effects.of(() -> fetchUser(id))
     .timeout(Duration.ofSeconds(5))
     .recover(e -> User.anonymous());
 ```
+
+## Reactive State Management
+
+The `State` module provides observable state that automatically notifies subscribers when values change.
+
+### Why State?
+
+Unlike plain variables, `State<T>` automatically notifies subscribers when the value changes:
+
+```java
+// Plain variable - must manually track changes
+int count = 0;
+count = 1; // No automatic notification ❌
+
+// State - subscribers are notified automatically
+State<Integer> count = State.of(0);
+count.subscribe(value -> System.out.println("Changed: " + value));
+
+count.set(1); // prints "Changed: 1" ✅
+count.set(2); // prints "Changed: 2" ✅
+```
+
+### Creating State
+
+```java
+import io.github.fike110.jeffect.state.State;
+
+// Simple (not thread-safe)
+State<Integer> counter = State.of(0);
+
+// Atomic (thread-safe)
+State<Integer> atomic = State.atomically(0);
+```
+
+### Subscribing
+
+```java
+State<String> username = State.of("");
+
+// Subscribe to changes
+username.subscribe(name -> System.out.println("Hello, " + name));
+
+username.set("Alice"); // prints "Hello, Alice"
+username.set("Bob");   // prints "Hello, Bob"
+```
+
+### Derived State
+
+Computed values that auto-update:
+
+```java
+State<Integer> count = State.of(5);
+
+// Derived states auto-update when source changes
+State<String> label = count.map(n -> "Count: " + n);
+State<Integer> doubled = count.map(n -> n * 2);
+
+System.out.println(label.get());   // "Count: 5"
+System.out.println(doubled.get()); // 10
+
+count.set(10);
+
+System.out.println(label.get());   // "Count: 10" (auto-updated!)
+System.out.println(doubled.get()); // 20 (auto-updated!)
+```
+
+### Using with Effect
+
+The `Watcher` class bridges State with Effect:
+
+```java
+import io.github.fike110.jeffect.state.State;
+import io.github.fike110.jeffect.state.Watcher;
+
+State<Integer> count = State.of(0);
+
+// Effect-like behavior - re-runs when state changes
+Watcher.watch(count, () -> {
+    System.out.println("Count is now: " + count.get());
+});
+
+count.set(1); // Effect runs
+count.set(2); // Effect runs again
+```
+
+### Real-World Use Case
+
+```java
+// UI State Management
+State<String> currentView = State.of("home");
+State<User> currentUser = State.of(null);
+
+// Automatically updates when state changes
+Watcher.watch(currentView, () -> renderView(currentView.get()));
+Watcher.watch(currentUser, () -> updateHeader(currentUser.get()));
+
+// Navigation
+currentView.set("profile");
+currentUser.set(fetchUser());
+```
+
+See the [State Module API docs](/api/state-type) for more examples.
 
 ## Integration Examples
 
