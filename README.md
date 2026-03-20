@@ -1,7 +1,7 @@
 # JEffect
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.fike110/jeffect.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.fike110/jeffect)
-[![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/javadoc.svg)](https://javadoc.io/doc/io.github.fike110/jeffect)
+[![javadoc](https://javadoc.io/badge2/io.github.fike110/jeffect/0.1.3.svg)](https://javadoc.io/doc/io.github.fike110/jeffect/0.1.3)
 
 A functional effect library for Java that provides deferred computation with elegant error handling.
 
@@ -13,14 +13,14 @@ A functional effect library for Java that provides deferred computation with ele
 <dependency>
     <groupId>io.github.fike110</groupId>
     <artifactId>jeffect</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'io.github.fike110:jeffect:0.1.2'
+implementation 'io.github.fike110:jeffect:0.1.3'
 ```
 
 ## Quick Start

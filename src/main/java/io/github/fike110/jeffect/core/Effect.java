@@ -676,8 +676,19 @@ public sealed interface Effect<T> permits Pure,Fail,Suspend,FlatMap,Recover{
     default Fiber<T> schedule(ScheduledExecutorService scheduler, Duration initialDelay, Duration interval) {
 
         CompletableFuture<T> future = new CompletableFuture<>();
+        java.util.concurrent.atomic.AtomicBoolean disposed = new java.util.concurrent.atomic.AtomicBoolean(false);
+        java.util.concurrent.atomic.AtomicBoolean paused = new java.util.concurrent.atomic.AtomicBoolean(false);
+        java.util.concurrent.Semaphore semaphore = new java.util.concurrent.Semaphore(0);
 
         Runnable task = () -> {
+            if (disposed.get()) return;
+            if (paused.get()) {
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
             try {
                 T result = this.run();
                 future.complete(result);
@@ -710,7 +721,36 @@ public sealed interface Effect<T> permits Pure,Fail,Suspend,FlatMap,Recover{
             @Override
             public Effect<Void> cancel() {
                 return Effects.of(() -> {
+                    disposed.set(true);
                     scheduled.cancel(true);
+                    return null;
+                });
+            }
+
+            @Override
+            public boolean isRunning() {
+                return !disposed.get() && !future.isDone();
+            }
+
+            @Override
+            public boolean isDisposed() {
+                return disposed.get();
+            }
+
+            @Override
+            public Effect<Void> pause() {
+                return Effects.of(() -> {
+                    paused.set(true);
+                    return null;
+                });
+            }
+
+            @Override
+            public Effect<Void> resume() {
+                return Effects.of(() -> {
+                    if (paused.getAndSet(false)) {
+                        semaphore.release();
+                    }
                     return null;
                 });
             }
@@ -749,6 +789,30 @@ public sealed interface Effect<T> permits Pure,Fail,Suspend,FlatMap,Recover{
                     return Effects.of(() -> {
                         future.cancel(true);
                         return null;
+                    });
+                }
+
+                @Override
+                public boolean isRunning() {
+                    return !future.isCancelled() && !future.isDone();
+                }
+
+                @Override
+                public boolean isDisposed() {
+                    return future.isCancelled();
+                }
+
+                @Override
+                public Effect<Void> pause() {
+                    return Effects.of(() -> {
+                        throw new UnsupportedOperationException("Pause not supported on forked fibers");
+                    });
+                }
+
+                @Override
+                public Effect<Void> resume() {
+                    return Effects.of(() -> {
+                        throw new UnsupportedOperationException("Resume not supported on forked fibers");
                     });
                 }
             };

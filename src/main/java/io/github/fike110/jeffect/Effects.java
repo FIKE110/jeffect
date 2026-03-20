@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -687,6 +688,118 @@ public final class Effects {
             acc = acc.recoverWith(err -> e);
         }
         return acc;
+    }
+
+    /**
+     * Creates an effect that runs a task at a fixed interval (polling).
+     * 
+     * <pre>{@code
+     * Effect<Fiber<Void>> polling = Effects.interval(() -> {
+     *     System.out.println("Checking server...");
+     * }, 5000);
+     * 
+     * // To stop polling:
+     * polling.run().cancel().run();
+     * }</pre>
+     * 
+     * @param runnable the task to run at each interval
+     * @param intervalMs the interval in milliseconds
+     * @return an Effect containing a Fiber that can be used to cancel the polling
+     */
+    public static Effect<Fiber<Void>> interval(Runnable runnable, long intervalMs) {
+        return interval(runnable, intervalMs, intervalMs);
+    }
+
+    /**
+     * Creates an effect that runs a task at a fixed interval (polling).
+     * 
+     * <pre>{@code
+     * Effect<Fiber<Void>> polling = Effects.interval(() -> {
+     *     System.out.println("Checking server...");
+     * }, 1000, 5000);
+     * }</pre>
+     * 
+     * @param runnable the task to run at each interval
+     * @param initialDelayMs the delay before first execution in milliseconds
+     * @param intervalMs the interval between executions in milliseconds
+     * @return an Effect containing a Fiber that can be used to cancel the polling
+     */
+    public static Effect<Fiber<Void>> interval(Runnable runnable, long initialDelayMs, long intervalMs) {
+        return interval(runnable, initialDelayMs, intervalMs, scheduler);
+    }
+
+    /**
+     * Creates an effect that runs a task at a fixed interval (polling) using a custom scheduler.
+     * 
+     * @param runnable the task to run at each interval
+     * @param initialDelayMs the delay before first execution in milliseconds
+     * @param intervalMs the interval between executions in milliseconds
+     * @param scheduler the scheduler to use
+     * @return an Effect containing a Fiber that can be used to cancel the polling
+     */
+    public static Effect<Fiber<Void>> interval(Runnable runnable, long initialDelayMs, long intervalMs, ScheduledExecutorService scheduler) {
+        return Effects.of(() -> {
+            ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
+                () -> {
+                    try {
+                        runnable.run();
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                },
+                initialDelayMs,
+                intervalMs,
+                TimeUnit.MILLISECONDS
+            );
+
+            return new Fiber<Void>() {
+                @Override
+                public Effect<Void> join() {
+                    return Effects.of(() -> {
+                        try {
+                            future.get();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (java.util.concurrent.ExecutionException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return null;
+                    });
+                }
+
+                @Override
+                public Effect<Void> cancel() {
+                    return Effects.of(() -> {
+                        future.cancel(true);
+                        return null;
+                    });
+                }
+
+                @Override
+                public boolean isRunning() {
+                    return !future.isCancelled() && !future.isDone();
+                }
+
+                @Override
+                public boolean isDisposed() {
+                    return future.isCancelled();
+                }
+
+                @Override
+                public Effect<Void> pause() {
+                    return Effects.of(() -> {
+                        throw new UnsupportedOperationException("Pause not supported on interval fibers");
+                    });
+                }
+
+                @Override
+                public Effect<Void> resume() {
+                    return Effects.of(() -> {
+                        throw new UnsupportedOperationException("Resume not supported on interval fibers");
+                    });
+                }
+            };
+        });
     }
 
     /**

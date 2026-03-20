@@ -13,7 +13,7 @@ export default defineConfig({
       { text: 'API', link: '/api/effects-factory' },
       { 
         text: 'Javadoc', 
-        link: 'https://javadoc.io/doc/io.github.fike110/jeffect',
+        link: 'https://javadoc.io/doc/io.github.fike110/jeffect/0.1.3',
         target: '_blank'
       },
       { text: 'GitHub', link: 'https://github.com/fike110/jeffect', target: '_blank' }

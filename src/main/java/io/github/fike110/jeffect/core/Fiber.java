@@ -32,18 +32,16 @@ import io.github.fike110.jeffect.Effects;
  */
 public interface Fiber<T> {
 
-    /**
-     * Waits for the fiber to complete and returns its result.
-     * 
-     * @return an Effect that completes with the fiber's value
-     */
     Effect<T> join();
 
-    /**
-     * Cancels the fiber's execution.
-     * 
-     * @return an Effect that completes when the fiber is cancelled
-     */
     Effect<Void> cancel();
+
+    boolean isRunning();
+
+    boolean isDisposed();
+
+    Effect<Void> pause();
+
+    Effect<Void> resume();
 
 }
