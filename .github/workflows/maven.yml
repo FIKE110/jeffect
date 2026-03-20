@@ -33,7 +33,6 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
     
     steps:
       - name: Checkout code
@@ -59,7 +58,7 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>ossrh</id>
+                <id>central</id>
                 <username>${{ secrets.OSSRH_USERNAME }}</username>
                 <password>${{ secrets.OSSRH_TOKEN }}</password>
               </server>
@@ -68,7 +67,7 @@ jobs:
           EOF
           
       - name: Deploy to Maven Central
-        run: mvn deploy -DskipTests
+        run: mvn clean deploy -DskipTests
         env:
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
